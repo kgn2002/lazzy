@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 const App = () => {
     const [isSolved, setIsSolved] = useState(false);
@@ -6,30 +6,29 @@ const App = () => {
     const [userAnswer, setUserAnswer] = useState('');
     const [feedbackMessage, setFeedbackMessage] = useState('');
     const [correctAnswer, setCorrectAnswer] = useState(0);
-    
     const [motivationalThought, setMotivationalThought] = useState('');
-
     const [time, setTime] = useState('');
     const [date, setDate] = useState('');
     const [day, setDay] = useState('');
 
-    const thoughts = [
-                "The only way to do great work is to love what you do.",
-                "Believe you can and you're halfway there.",
-                "The future belongs to those who believe in the beauty of their dreams.",
-                "The secret of getting ahead is getting started.",
-                "It always seems impossible until it's done.",
-                "The best time to plant a tree was 20 years ago. The second best time is now."
-            ];
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null); // ✅ persist timeout
 
+    const thoughts = [
+        "The only way to do great work is to love what you do.",
+        "Believe you can and you're halfway there.",
+        "The future belongs to those who believe in the beauty of their dreams.",
+        "The secret of getting ahead is getting started.",
+        "It always seems impossible until it's done.",
+        "The best time to plant a tree was 20 years ago. The second best time is now."
+    ];
 
     const generatePuzzle = () => {
         const num1 = Math.floor(Math.random() * 20) + 1;
         const num2 = Math.floor(Math.random() * 20) + 1;
         const operator = ['+', '-', '*'][Math.floor(Math.random() * 3)];
-        
+
         let problem: string = '';
-let answer: number = 0;
+        let answer: number = 0;
 
         switch (operator) {
             case '+':
@@ -72,22 +71,22 @@ let answer: number = 0;
 
     const handleSubmit = () => {
         const parsedAnswer = parseInt(userAnswer, 10);
-        
+
         if (parsedAnswer === correctAnswer) {
             setIsSolved(true);
-            const randomindex = Math.floor(Math.random() * thoughts.length);
-            setMotivationalThought(thoughts[randomindex]);
+            const randomIndex = Math.floor(Math.random() * thoughts.length);
+            setMotivationalThought(thoughts[randomIndex]);
         } else {
             setFeedbackMessage('Incorrect, please try again.');
         }
     };
 
     const resetSession = () => {
-                setIsSolved(false);
-                generatePuzzle();
-                setFeedbackMessage('Session timed out. A new puzzle has been generated.');
-            };
-
+        console.log('Session timed out. Resetting...');
+        setIsSolved(false);
+        generatePuzzle();
+        setFeedbackMessage('Session timed out. A new puzzle has been generated.');
+    };
 
     useEffect(() => {
         generatePuzzle();
@@ -97,48 +96,47 @@ let answer: number = 0;
         if (isSolved) {
             updateTime();
             const intervalId = setInterval(updateTime, 1000);
-            
             return () => clearInterval(intervalId);
         }
     }, [isSolved]);
-    useEffect(() => { 
-                let timeout=0;
-                const activityEvents = ['mousemove', 'keydown', 'click', 'touchstart'];
-                const TIMEOUT_DURATION = 120000; // 2 minutes in milliseconds
 
-                const resetTimer = () => {
-                    clearTimeout(timeout);
-                    timeout = setTimeout(resetSession, TIMEOUT_DURATION);
-                };
+    useEffect(() => {
+        const activityEvents = ['mousemove', 'keydown', 'click', 'touchstart'];
+        const TIMEOUT_DURATION = 120000; // 2 minutes
 
-                const setupListeners = () => {
-                    activityEvents.forEach(event => {
-                        window.addEventListener(event, resetTimer);
-                    });
-                };
-                
-                const cleanupListeners = () => {
-                    activityEvents.forEach(event => {
-                        window.removeEventListener(event, resetTimer);
-                    });
-                };
+        const resetTimer = () => {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+            timeoutRef.current = setTimeout(resetSession, TIMEOUT_DURATION);
+        };
 
-                // Initialize the timer and event listeners
-                resetTimer();
-                setupListeners();
-                
-                // Cleanup function for the effect
-                return () => {
-                    clearTimeout(timeout);
-                    cleanupListeners();
-                };
-            }, []);
+        const setupListeners = () => {
+            activityEvents.forEach(event => {
+                window.addEventListener(event, resetTimer);
+            });
+        };
+
+        const cleanupListeners = () => {
+            activityEvents.forEach(event => {
+                window.removeEventListener(event, resetTimer);
+            });
+        };
+
+        resetTimer();
+        setupListeners();
+
+        return () => {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+            cleanupListeners();
+        };
+    }, []);
 
     return (
-        
         <div className="flex items-center justify-center min-h-screen p-4 bg-gray-900 text-gray-100 w-screen">
             <div className="bg-gray-800 p-8 md:p-12 rounded-2xl shadow-2xl max-w-lg w-full text-center">
-                
                 {!isSolved ? (
                     <div className="flex flex-col items-center">
                         <h1 className="text-3xl md:text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-blue-500">
