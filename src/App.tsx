@@ -28,8 +28,8 @@ const App = () => {
         const num2 = Math.floor(Math.random() * 20) + 1;
         const operator = ['+', '-', '*'][Math.floor(Math.random() * 3)];
         
-        let problem;
-        let answer;
+        let problem: string = '';
+let answer: number = 0;
 
         switch (operator) {
             case '+':
