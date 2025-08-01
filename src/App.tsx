@@ -6,7 +6,7 @@ const App = () => {
     const [userAnswer, setUserAnswer] = useState('');
     const [feedbackMessage, setFeedbackMessage] = useState('');
     const [correctAnswer, setCorrectAnswer] = useState(0);
-    //@ts-ignore
+    
     const [motivationalThought, setMotivationalThought] = useState('');
 
     const [time, setTime] = useState('');
@@ -129,6 +129,7 @@ let answer: number = 0;
                         </h1>
                         <p className="text-xl md:text-2xl font-semibold text-gray-300">{date}</p>
                         <p className="text-xl md:text-2xl font-semibold text-gray-300">{day}</p>
+                        <p className="text-xl md:text-2xl font-semibold text-gray-300">{motivationalThought}</p>
                     </div>
                 )}
             </div>
