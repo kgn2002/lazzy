@@ -6,7 +6,7 @@ const App = () => {
     const [userAnswer, setUserAnswer] = useState('');
     const [feedbackMessage, setFeedbackMessage] = useState('');
     const [correctAnswer, setCorrectAnswer] = useState(0);
-
+    //@ts-ignore
     const [motivationalThought, setMotivationalThought] = useState('');
 
     const [time, setTime] = useState('');
