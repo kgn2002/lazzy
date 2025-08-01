@@ -82,6 +82,13 @@ let answer: number = 0;
         }
     };
 
+    const resetSession = () => {
+                setIsSolved(false);
+                generatePuzzle();
+                setFeedbackMessage('Session timed out. A new puzzle has been generated.');
+            };
+
+
     useEffect(() => {
         generatePuzzle();
     }, []);
@@ -94,6 +101,38 @@ let answer: number = 0;
             return () => clearInterval(intervalId);
         }
     }, [isSolved]);
+    useEffect(() => { 
+                let timeout=0;
+                const activityEvents = ['mousemove', 'keydown', 'click', 'touchstart'];
+                const TIMEOUT_DURATION = 120000; // 2 minutes in milliseconds
+
+                const resetTimer = () => {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(resetSession, TIMEOUT_DURATION);
+                };
+
+                const setupListeners = () => {
+                    activityEvents.forEach(event => {
+                        window.addEventListener(event, resetTimer);
+                    });
+                };
+                
+                const cleanupListeners = () => {
+                    activityEvents.forEach(event => {
+                        window.removeEventListener(event, resetTimer);
+                    });
+                };
+
+                // Initialize the timer and event listeners
+                resetTimer();
+                setupListeners();
+                
+                // Cleanup function for the effect
+                return () => {
+                    clearTimeout(timeout);
+                    cleanupListeners();
+                };
+            }, []);
 
     return (
         
