@@ -11,7 +11,7 @@ const App = () => {
     const [date, setDate] = useState('');
     const [day, setDay] = useState('');
 
-    const timeoutRef = useRef<NodeJS.Timeout | null>(null); // ✅ persist timeout
+    const timeoutRef = useRef< number | null>(null); // ✅ persist timeout
 
     const thoughts = [
         "The only way to do great work is to love what you do.",
